@@ -10,6 +10,16 @@ pub struct Board {
 }
 
 impl Board {
+    // TODO: Better new fn
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            map: vec![],
+            ranks: 0,
+            files: 0,
+        }
+    }
+
     #[must_use]
     pub const fn ranks(&self) -> u8 {
         self.ranks
@@ -105,6 +115,12 @@ impl Board {
                 }
             })
         })
+    }
+}
+
+impl Default for Board {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

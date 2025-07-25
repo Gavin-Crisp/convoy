@@ -21,6 +21,14 @@ pub struct Game {
 
 impl Game {
     #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            board: Board::new(),
+            current_player: Player::P1,
+        }
+    }
+
+    #[must_use]
     pub const fn board(&self) -> &Board {
         &self.board
     }
@@ -61,5 +69,11 @@ impl Game {
         _defence_supporters: Vec<BattleActor>,
     ) {
         todo!()
+    }
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
     }
 }
