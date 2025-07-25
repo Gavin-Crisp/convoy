@@ -1,4 +1,4 @@
-use crate::{piece::Piece, Player};
+use crate::{piece::Piece, player::Player};
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Tile {

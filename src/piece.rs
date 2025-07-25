@@ -1,4 +1,4 @@
-use crate::Player;
+use crate::player::Player;
 use std::ops::Range;
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
