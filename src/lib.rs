@@ -55,8 +55,54 @@ impl Game {
         }
     }
 
-    pub const fn do_move(&mut self, _from: Coord, _to: Coord) {
-        todo!()
+    pub fn do_move(&mut self, from: Coord, to: Coord) {
+        if !self.can_move(from, to, self.current_player) {
+            // Error State
+            return;
+        }
+
+        self.board.move_piece(from, to);
+    }
+
+    #[must_use]
+    pub fn can_move(&self, from: Coord, to: Coord, player: Player) -> bool {
+        let Some(from_tile) = self.board.get(from) else {
+            // Error State
+            return false;
+        };
+
+        let Some(to_tile) = self.board.get(to) else {
+            // Error State
+            return false;
+        };
+
+        if to_tile.piece_option.is_some() {
+            // Error State
+            return false;
+        }
+
+        let Some(piece) = from_tile.piece_option else {
+            // Error State
+            return false;
+        };
+
+        if piece.exhausted {
+            // Error State
+            return false;
+        }
+
+        if piece.owner() != player {
+            return false;
+        }
+
+        if from.distance(to) > piece.speed() {
+            // Error State
+            return false;
+        }
+
+        // TODO: check pathing
+
+        true
     }
 
     pub fn do_recruit(&mut self, piece_type: PieceType, coord: Coord) {

@@ -111,6 +111,17 @@ impl Board {
                 }
             })
     }
+
+    pub fn move_piece(&mut self, from: Coord, to: Coord) {
+        let Some(mut piece) = self[from].piece_option else {
+            // Error State
+            return;
+        };
+
+        piece.exhausted = true;
+        self[to].piece_option = Some(piece);
+        self[from].piece_option = None;
+    }
 }
 
 impl Default for Board {
