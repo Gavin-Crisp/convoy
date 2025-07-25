@@ -57,7 +57,7 @@ impl Game {
 
     pub fn do_move(&mut self, from: Coord, to: Coord) {
         if !self.can_move(from, to, self.current_player) {
-            // Error State
+            // TODO: Error handling
             return;
         }
 
@@ -67,27 +67,27 @@ impl Game {
     #[must_use]
     pub fn can_move(&self, from: Coord, to: Coord, player: Player) -> bool {
         let Some(from_tile) = self.board.get(from) else {
-            // Error State
+            // TODO: Error handling
             return false;
         };
 
         let Some(to_tile) = self.board.get(to) else {
-            // Error State
+            // TODO: Error handling
             return false;
         };
 
         if to_tile.piece_option.is_some() {
-            // Error State
+            // TODO: Error handling
             return false;
         }
 
         let Some(piece) = from_tile.piece_option else {
-            // Error State
+            // TODO: Error handling
             return false;
         };
 
         if piece.exhausted {
-            // Error State
+            // TODO: Error handling
             return false;
         }
 
@@ -96,7 +96,7 @@ impl Game {
         }
 
         if from.distance(to) > piece.speed() {
-            // Error State
+            // TODO: Error handling
             return false;
         }
 
@@ -107,22 +107,22 @@ impl Game {
 
     pub fn do_recruit(&mut self, piece_type: PieceType, coord: Coord) {
         let Some(tile) = self.board.get(coord) else {
-            // Error state
+            // TODO: Error handling
             return;
         };
 
         if tile.piece_option.is_some() {
-            // Error state
+            // TODO: Error handling
             return;
         }
 
         if !tile.can_recruit(self.current_player) {
-            // Error state
+            // TODO: Error handling
             return;
         }
 
         if self.money[self.current_player] < piece_type.cost() {
-            // Error state
+            // TODO: Error handling
             return;
         }
 
