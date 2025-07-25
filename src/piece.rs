@@ -35,37 +35,22 @@ impl Piece {
 
     #[must_use]
     pub const fn speed(self) -> u8 {
-        match self.kind {
-            PieceType::Artillery | PieceType::Infantry => 2,
-            PieceType::Convoy | PieceType::Recon => 3,
-        }
+        self.kind.speed()
     }
 
     #[must_use]
     pub const fn power(self) -> u8 {
-        match self.kind {
-            PieceType::Artillery | PieceType::Infantry => 2,
-            PieceType::Convoy => 0,
-            PieceType::Recon => 1,
-        }
+        self.kind.power()
     }
 
     #[must_use]
     pub const fn range(self) -> Range<u8> {
-        match self.kind {
-            PieceType::Artillery => 2..4,
-            PieceType::Convoy => 0..0,
-            PieceType::Infantry | PieceType::Recon => 1..2,
-        }
+        self.kind.range()
     }
 
     #[must_use]
     pub const fn cost(self) -> u8 {
-        match self.kind {
-            PieceType::Artillery | PieceType::Convoy => 3,
-            PieceType::Infantry => 2,
-            PieceType::Recon => 4,
-        }
+        self.kind.cost()
     }
 }
 
@@ -75,4 +60,41 @@ pub enum PieceType {
     Convoy,
     Infantry,
     Recon,
+}
+
+impl PieceType {
+    #[must_use]
+    pub const fn speed(self) -> u8 {
+        match self {
+            Self::Artillery | Self::Infantry => 2,
+            Self::Convoy | Self::Recon => 3,
+        }
+    }
+
+    #[must_use]
+    pub const fn power(self) -> u8 {
+        match self {
+            Self::Artillery | Self::Infantry => 2,
+            Self::Convoy => 0,
+            Self::Recon => 1,
+        }
+    }
+
+    #[must_use]
+    pub const fn range(self) -> Range<u8> {
+        match self {
+            Self::Artillery => 2..4,
+            Self::Convoy => 0..0,
+            Self::Infantry | Self::Recon => 1..2,
+        }
+    }
+
+    #[must_use]
+    pub const fn cost(self) -> u8 {
+        match self {
+            Self::Artillery | Self::Convoy => 3,
+            Self::Infantry => 2,
+            Self::Recon => 4,
+        }
+    }
 }
