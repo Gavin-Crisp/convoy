@@ -1,30 +1,26 @@
-use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Sub, SubAssign};
+use std::{
+    fmt::{Display, Formatter},
+    ops::{Add, AddAssign, Sub, SubAssign},
+};
 
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct Coord {
-    pub rank: u8,
-    pub file: u8,
+    pub(crate) rank: u8,
+    pub(crate) file: u8,
 }
 
 impl Coord {
     #[must_use]
-    pub const fn new(rank: u8, file: u8) -> Self {
-        Self { rank, file }
+    pub const fn rank(self) -> u8 {
+        self.rank
+    }
+
+    #[must_use]
+    pub const fn file(self) -> u8 {
+        self.file
     }
 
     /// Returns the distance between two coordinates in tiles through orthogonal connections
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use convoy::coordinates::Coord;
-    ///
-    /// let here = Coord::new(0, 3);
-    /// let there = Coord::new(1, 1);
-    ///
-    /// assert_eq!(here.distance(there), 3);
-    /// ```
     #[must_use]
     pub const fn distance(self, other: Self) -> u8 {
         self.rank.abs_diff(other.rank) + self.file.abs_diff(other.file)
