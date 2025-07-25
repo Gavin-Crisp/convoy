@@ -42,16 +42,16 @@ impl Game {
 }
 
 impl Game {
-    pub fn do_command(&mut self, command: Command) {
+    pub fn do_command(&mut self, command: &Command) {
         match command {
-            Command::Move { from, to } => self.do_move(from, to),
-            Command::Recruit { piece_type, coord } => self.do_recruit(piece_type, coord),
+            Command::Move { from, to } => self.do_move(*from, *to),
+            Command::Recruit { piece_type, coord } => self.do_recruit(*piece_type, *coord),
             Command::Battle {
                 target,
                 initiator,
                 attack_supporters,
                 defence_supporters,
-            } => self.do_battle(target, initiator, attack_supporters, defence_supporters),
+            } => self.do_battle(*target, *initiator, attack_supporters, defence_supporters),
         }
     }
 
@@ -134,8 +134,8 @@ impl Game {
         &mut self,
         _target: Coord,
         _initiator: BattleActor,
-        _attack_supporters: Vec<BattleActor>,
-        _defence_supporters: Vec<BattleActor>,
+        _attack_supporters: &[BattleActor],
+        _defence_supporters: &[BattleActor],
     ) {
         todo!()
     }
