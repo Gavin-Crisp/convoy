@@ -4,7 +4,7 @@ use std::ops::Range;
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Piece {
     kind: PieceType,
-    exhausted: bool,
+    pub exhausted: bool,
     owner: Player,
 }
 
@@ -21,11 +21,6 @@ impl Piece {
     #[must_use]
     pub const fn kind(self) -> PieceType {
         self.kind
-    }
-
-    #[must_use]
-    pub const fn exhausted(self) -> bool {
-        self.exhausted
     }
 
     #[must_use]
