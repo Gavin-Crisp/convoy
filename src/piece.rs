@@ -10,6 +10,15 @@ pub struct Piece {
 
 impl Piece {
     #[must_use]
+    pub const fn new(kind: PieceType, owner: Player) -> Self {
+        Self {
+            kind,
+            exhausted: true,
+            owner,
+        }
+    }
+
+    #[must_use]
     pub const fn kind(self) -> PieceType {
         self.kind
     }
