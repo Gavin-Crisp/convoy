@@ -52,6 +52,21 @@ impl Piece {
     pub const fn cost(self) -> u8 {
         self.kind.cost()
     }
+
+    #[must_use]
+    pub const fn can_initiate(self) -> bool {
+        self.kind.can_initiate()
+    }
+
+    #[must_use]
+    pub const fn can_defend(self) -> bool {
+        self.kind.can_defend()
+    }
+
+    #[must_use]
+    pub const fn can_support(self, is_attacking: bool, is_moving: bool) -> bool {
+        self.kind.can_support(is_attacking, is_moving)
+    }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -95,6 +110,26 @@ impl PieceType {
             Self::Artillery | Self::Convoy => 3,
             Self::Infantry => 2,
             Self::Recon => 4,
+        }
+    }
+
+    #[must_use]
+    pub const fn can_initiate(self) -> bool {
+        matches!(self, Self::Infantry | Self::Recon)
+    }
+
+    #[must_use]
+    pub const fn can_defend(self) -> bool {
+        matches!(self, Self::Infantry | Self::Recon)
+    }
+
+    #[must_use]
+    pub const fn can_support(self, is_attacking: bool, is_moving: bool) -> bool {
+        match self {
+            Self::Artillery => !is_moving,
+            Self::Convoy => false,
+            Self::Infantry => !is_moving || is_attacking,
+            Self::Recon => true,
         }
     }
 }
