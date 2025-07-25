@@ -1,0 +1,22 @@
+[package]
+name = "convoy"
+description = "A turn based strategy game based on advance wars"
+version = "0.0.0"
+categories = ["games"]
+keywords = ["game", "boardgame", "turn-based"]
+license = "GPL-3"
+edition = "2024"
+repository = "https://github.com/Gavin-Crisp/convoy"
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+complexity = "deny"
+nursery = "deny"
+pedantic = "deny"
+style = "deny"
+unwrap_used = "deny"
+cargo_common_metadata = "deny"
+
+[dependencies]
