@@ -35,32 +35,3 @@ impl Display for Coord {
         write!(f, "({}:{})", self.rank, self.file)
     }
 }
-
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
-pub struct Move {
-    pub from: Coord,
-    pub to: Coord,
-}
-
-impl Move {
-    #[must_use]
-    pub const fn new(from: Coord, to: Coord) -> Self {
-        Self { from, to }
-    }
-
-    /// Returns the distance between the start and end position
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use convoy::coordinates::{Coord, Move};
-    ///
-    /// let r#move = Move::new(Coord::new(2, 3), Coord::new(5, 2));
-    ///
-    /// assert_eq!(r#move.distance(), 4);
-    /// ```
-    #[must_use]
-    pub const fn distance(self) -> u8 {
-        self.from.distance(self.to)
-    }
-}
