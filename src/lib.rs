@@ -1,3 +1,4 @@
+pub mod board;
 pub mod coordinates;
 pub mod piece;
 pub mod tile;
@@ -5,5 +6,5 @@ pub mod tile;
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Player {
     P1,
-    P2
+    P2,
 }
