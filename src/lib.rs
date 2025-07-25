@@ -2,7 +2,7 @@ use crate::{
     actions::{BattleActor, Command},
     board::Board,
     coordinates::Coord,
-    piece::PieceType,
+    piece::{Piece, PieceType},
     player::Player,
 };
 
@@ -17,6 +17,7 @@ pub mod tile;
 pub struct Game {
     board: Board,
     current_player: Player,
+    money: [u8; 2],
 }
 
 impl Game {
@@ -25,6 +26,7 @@ impl Game {
         Self {
             board: Board::new(),
             current_player: Player::P1,
+            money: [0, 0],
         }
     }
 
@@ -57,8 +59,29 @@ impl Game {
         todo!()
     }
 
-    pub const fn do_recruit(&mut self, _piece_type: PieceType, _coord: Coord) {
-        todo!()
+    pub fn do_recruit(&mut self, piece_type: PieceType, coord: Coord) {
+        let Some(tile) = self.board.get(coord) else {
+            // Error state
+            return;
+        };
+
+        if tile.piece_option.is_some() {
+            // Error state
+            return;
+        }
+
+        if !tile.can_recruit(self.current_player) {
+            // Error state
+            return;
+        }
+
+        if self.money[self.current_player] < piece_type.cost() {
+            // Error state
+            return;
+        }
+
+        self.money[self.current_player] -= piece_type.cost();
+        self.board[coord].piece_option = Some(Piece::new(piece_type, self.current_player));
     }
 
     pub fn do_battle(
