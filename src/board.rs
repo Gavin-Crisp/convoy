@@ -4,7 +4,7 @@ use std::ops::{Index, IndexMut};
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Board {
     /// Vec of ranks of tiles
-    map: Vec<Vec<Option<Tile>>>,
+    map: Vec<Option<Tile>>,
     ranks: u8,
     files: u8,
 }
@@ -54,7 +54,7 @@ impl Board {
         if coord.rank >= self.ranks || coord.file >= self.files {
             None
         } else {
-            self.map[coord.rank as usize][coord.file as usize]
+            self.map[(coord.rank * self.files + coord.file) as usize]
         }
     }
 
@@ -65,16 +65,14 @@ impl Board {
     /// `coord` must index a tile that exists.
     pub fn get_mut(&mut self, coord: Coord) -> Option<&mut Tile> {
         if self.coord_in_bounds(coord) {
-            self.map[coord.rank as usize][coord.file as usize].as_mut()
+            self.map[(coord.rank * self.files + coord.file) as usize].as_mut()
         } else {
             None
         }
     }
 
     pub fn tiles(&self) -> impl Iterator<Item = Tile> {
-        self.map
-            .iter()
-            .flat_map(|rank| rank.iter().filter_map(|tile_option| *tile_option))
+        self.map.iter().filter_map(|tile_option| *tile_option)
     }
 
     /// Returns a Vec of the coords of all neighbours of `coord` or an error
@@ -101,20 +99,17 @@ impl Board {
         )
     }
 
-    #[expect(clippy::missing_panics_doc)]
     pub fn piece_coords(&self) -> impl Iterator<Item = Coord> {
-        self.map.iter().enumerate().flat_map(|(i, rank)| {
-            rank.iter().enumerate().filter_map(move |(j, tile_option)| {
+        (0..self.ranks)
+            .flat_map(|rank| (0..self.files).map(move |file| Coord { rank, file }))
+            .zip(self.map.iter())
+            .filter_map(|(coord, tile_option)| {
                 if tile_option.is_some_and(|tile| tile.piece_option.is_some()) {
-                    Some(Coord {
-                        rank: i.try_into().expect("Valid Boards are <= 256x256"),
-                        file: j.try_into().expect("Valid Boards are <= 256x256"),
-                    })
+                    Some(coord)
                 } else {
                     None
                 }
             })
-        })
     }
 }
 
@@ -128,7 +123,7 @@ impl Index<Coord> for Board {
     type Output = Tile;
 
     fn index(&self, index: Coord) -> &Self::Output {
-        self.map[index.rank as usize][index.file as usize]
+        self.map[(index.rank * self.files + index.file) as usize]
             .as_ref()
             .expect("Indexed invalid tile")
     }
@@ -136,7 +131,7 @@ impl Index<Coord> for Board {
 
 impl IndexMut<Coord> for Board {
     fn index_mut(&mut self, index: Coord) -> &mut Self::Output {
-        self.map[index.rank as usize][index.file as usize]
+        self.map[(index.rank * self.files + index.file) as usize]
             .as_mut()
             .expect("Indexed invalid tile")
     }
