@@ -1,6 +1,7 @@
 use crate::{coordinates::Coord, tile::Tile};
 use std::ops::{Index, IndexMut};
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Board {
     /// Vec of ranks of tiles
     map: Vec<Vec<Option<Tile>>>,
