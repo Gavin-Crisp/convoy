@@ -57,7 +57,7 @@ impl Game {
     }
 
     pub fn do_move(&mut self, from: Coord, to: Coord) {
-        if !self.can_move(from, to, self.current_player) {
+        if !self.can_do_move(from, to) {
             // TODO: Error handling
             return;
         }
@@ -66,7 +66,12 @@ impl Game {
     }
 
     #[must_use]
-    pub fn can_move(&self, from: Coord, to: Coord, player: Player) -> bool {
+    pub fn can_do_move(&self, from: Coord, to: Coord) -> bool {
+        self.can_move(from, to, self.current_player)
+    }
+
+    #[must_use]
+    fn can_move(&self, from: Coord, to: Coord, player: Player) -> bool {
         let Some(from_tile) = self.board.get(from) else {
             // TODO: Error handling
             return false;
