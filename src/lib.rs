@@ -178,9 +178,48 @@ impl Game {
             return;
         }
 
-        todo!()
+        let attack_power = attack_supporters
+            .iter()
+            .fold(self.resolve_actor(initiator), |power, actor| {
+                power + self.resolve_actor(*actor)
+            });
+        let defence_power = defence_supporters.iter().fold(
+            if target_is_defending {
+                self.resolve_actor(BattleActor::Static { coord: target })
+            } else {
+                0
+            },
+            |power, actor| power + self.resolve_actor(*actor),
+        );
+
+        if attack_power > defence_power {
+            self.board[target].piece_option = None;
+        }
     }
 
+    fn resolve_actor(&mut self, battle_actor: BattleActor) -> u8 {
+        match battle_actor {
+            BattleActor::Static { coord } => {
+                let mut piece = self.board[coord]
+                    .piece_option
+                    .expect("Already checked for errors");
+                piece.exhausted = true;
+                self.board[coord].piece_option = Some(piece);
+                piece.power()
+            }
+            BattleActor::Moving { from, to } => {
+                let mut piece = self.board[from]
+                    .piece_option
+                    .expect("Already checked for errors");
+                piece.exhausted = true;
+                self.board[to].piece_option = Some(piece);
+                self.board[from].piece_option = None;
+                piece.power()
+            }
+        }
+    }
+
+    #[must_use]
     pub fn can_do_battle(
         &self,
         target: Coord,
