@@ -62,13 +62,20 @@ impl Game {
         }
     }
 
+    #[expect(clippy::missing_panics_doc)]
     pub fn do_move(&mut self, from: Coord, to: Coord) {
         if !self.can_do_move(from, to) {
             // TODO: Error handling
             return;
         }
 
-        self.board.move_piece(from, to);
+        let mut piece = self.board[from]
+            .piece_option
+            .expect("Already checked for error");
+
+        piece.exhausted = true;
+        self.board[to].piece_option = Some(piece);
+        self.board[from].piece_option = None;
     }
 
     #[must_use]
