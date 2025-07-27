@@ -181,7 +181,7 @@ impl Game {
         todo!()
     }
 
-    fn can_do_battle(
+    pub fn can_do_battle(
         &self,
         target: Coord,
         target_is_defending: bool,
