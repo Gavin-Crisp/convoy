@@ -118,28 +118,38 @@ impl Game {
     }
 
     pub fn do_recruit(&mut self, piece_type: PieceType, coord: Coord) {
-        let Some(tile) = self.board.get(coord) else {
-            // TODO: Error handling
-            return;
-        };
-
-        if tile.piece_option.is_some() {
-            // TODO: Error handling
-            return;
-        }
-
-        if !tile.can_recruit(self.current_player) {
-            // TODO: Error handling
-            return;
-        }
-
-        if self.money[self.current_player] < piece_type.cost() {
+        if !self.can_do_recruit(piece_type, coord) {
             // TODO: Error handling
             return;
         }
 
         self.money[self.current_player] -= piece_type.cost();
         self.board[coord].piece_option = Some(Piece::new(piece_type, self.current_player));
+    }
+
+    #[must_use]
+    pub fn can_do_recruit(&self, piece_type: PieceType, coord: Coord) -> bool {
+        let Some(tile) = self.board.get(coord) else {
+            // TODO: Error handling
+            return false;
+        };
+
+        if tile.piece_option.is_some() {
+            // TODO: Error handling
+            return false;
+        }
+
+        if !tile.can_recruit(self.current_player) {
+            // TODO: Error handling
+            return false;
+        }
+
+        if self.money[self.current_player] < piece_type.cost() {
+            // TODO: Error handling
+            return false;
+        }
+
+        true
     }
 
     pub fn do_battle(
