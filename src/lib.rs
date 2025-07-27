@@ -52,7 +52,13 @@ impl Game {
                 initiator,
                 attack_supporters,
                 defence_supporters,
-            } => self.do_battle(*target, *target_is_defending, *initiator, attack_supporters, defence_supporters),
+            } => self.do_battle(
+                *target,
+                *target_is_defending,
+                *initiator,
+                attack_supporters,
+                defence_supporters,
+            ),
         }
     }
 
@@ -138,13 +144,127 @@ impl Game {
 
     pub fn do_battle(
         &mut self,
-        _target: Coord,
-        _target_is_defending: bool,
-        _initiator: BattleActor,
-        _attack_supporters: &[BattleActor],
-        _defence_supporters: &[BattleActor],
+        target: Coord,
+        target_is_defending: bool,
+        initiator: BattleActor,
+        attack_supporters: &[BattleActor],
+        defence_supporters: &[BattleActor],
     ) {
+        if !self.can_do_battle(
+            target,
+            target_is_defending,
+            initiator,
+            attack_supporters,
+            defence_supporters,
+        ) {
+            // TODO: Error handling
+            return;
+        }
+
         todo!()
+    }
+
+    fn can_do_battle(
+        &self,
+        target: Coord,
+        target_is_defending: bool,
+        initiator: BattleActor,
+        attack_supporters: &[BattleActor],
+        defence_supporters: &[BattleActor],
+    ) -> bool {
+        let Some(target_tile) = self.board.get(target) else {
+            // TODO: Error handling
+            return false;
+        };
+
+        let Some(target_piece) = target_tile.piece_option else {
+            // TODO: Error handling
+            return false;
+        };
+
+        if target_piece.owner() == self.current_player {
+            // TODO: Error handling
+            return false;
+        }
+
+        if target_is_defending && !target_piece.can_defend() {
+            // TODO: Error handling
+            return false;
+        }
+
+        if !self.validate_actor(initiator, target, self.current_player, true) {
+            // TODO: Error handling
+            return false;
+        }
+
+        if !attack_supporters
+            .iter()
+            .all(|actor| self.validate_actor(*actor, target, self.current_player, true))
+        {
+            // TODO: Error handling
+            return false;
+        }
+
+        if !defence_supporters
+            .iter()
+            .all(|actor| self.validate_actor(*actor, target, -self.current_player, false))
+        {
+            // TODO: Error handling
+            return false;
+        }
+
+        true
+    }
+
+    fn validate_actor(
+        &self,
+        battle_actor: BattleActor,
+        target: Coord,
+        player: Player,
+        is_attacking: bool,
+    ) -> bool {
+        let (piece, end_coord, is_moving) = match battle_actor {
+            BattleActor::Static { coord } => {
+                let Some(tile) = self.board.get(coord) else {
+                    // TODO: Error handling
+                    return false;
+                };
+
+                let Some(piece) = tile.piece_option else {
+                    // TODO: Error handling
+                    return false;
+                };
+
+                if piece.exhausted {
+                    // TODO: Error handling
+                    return false;
+                }
+
+                if piece.owner() != player {
+                    // TODO: Error handling
+                    return false;
+                }
+
+                (piece, coord, false)
+            }
+            BattleActor::Moving { from, to } => {
+                if !self.can_move(from, to, player) {
+                    // TODO: Error handling
+                    return false;
+                }
+
+                (
+                    self.board[from]
+                        .piece_option
+                        .expect("Already know it exists"),
+                    to,
+                    true,
+                )
+            }
+        };
+
+        piece.range().contains(&end_coord.distance(target))
+            && piece.can_support(is_attacking, is_moving)
     }
 }
 
