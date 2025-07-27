@@ -12,6 +12,7 @@ pub enum Command {
     },
     Battle {
         target: Coord,
+        target_is_defending: bool,
         initiator: BattleActor,
         attack_supporters: Vec<BattleActor>,
         defence_supporters: Vec<BattleActor>,

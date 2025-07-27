@@ -48,10 +48,11 @@ impl Game {
             Command::Recruit { piece_type, coord } => self.do_recruit(*piece_type, *coord),
             Command::Battle {
                 target,
+                target_is_defending,
                 initiator,
                 attack_supporters,
                 defence_supporters,
-            } => self.do_battle(*target, *initiator, attack_supporters, defence_supporters),
+            } => self.do_battle(*target, *target_is_defending, *initiator, attack_supporters, defence_supporters),
         }
     }
 
@@ -133,6 +134,7 @@ impl Game {
     pub fn do_battle(
         &mut self,
         _target: Coord,
+        _target_is_defending: bool,
         _initiator: BattleActor,
         _attack_supporters: &[BattleActor],
         _defence_supporters: &[BattleActor],
