@@ -1,7 +1,7 @@
 use crate::{
     actions::{BattleActor, Command},
     board::Board,
-    coordinates::Coord,
+    coordinates::{Coord, Coordinate},
     piece::{Piece, PieceType},
     player::Player,
 };

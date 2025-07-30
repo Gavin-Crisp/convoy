@@ -1,4 +1,8 @@
-use crate::{coordinates::Coord, tile::Tile};
+use crate::{
+    coordinates::{Coord, Coordinate, PieceCoord},
+    piece::Piece,
+    tile::Tile,
+};
 use std::ops::{Index, IndexMut};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -33,15 +37,15 @@ impl Board {
     #[must_use]
     pub const fn new_coord(&self, rank: u8, file: u8) -> Option<Coord> {
         if rank <= self.ranks && file <= self.files {
-            Some(Coord { rank, file })
+            Some(Coord::new(rank, file))
         } else {
             None
         }
     }
 
     #[must_use]
-    pub const fn coord_in_bounds(&self, coord: Coord) -> bool {
-        coord.rank < self.ranks && coord.file < self.files
+    pub fn coord_in_bounds(&self, coord: Coord) -> bool {
+        coord.rank() < self.ranks && coord.file() < self.files
     }
 
     /// Returns a copy of the tile at `coord` or an error
@@ -51,10 +55,10 @@ impl Board {
     /// `coord` must index a tile that exists.
     #[must_use]
     pub fn get(&self, coord: Coord) -> Option<Tile> {
-        if coord.rank >= self.ranks || coord.file >= self.files {
+        if coord.rank() >= self.ranks || coord.file() >= self.files {
             None
         } else {
-            self.map[(coord.rank * self.files + coord.file) as usize]
+            self.map[(coord.rank() * self.files + coord.file()) as usize]
         }
     }
 
@@ -65,7 +69,7 @@ impl Board {
     /// `coord` must index a tile that exists.
     pub fn get_mut(&mut self, coord: Coord) -> Option<&mut Tile> {
         if self.coord_in_bounds(coord) {
-            self.map[(coord.rank * self.files + coord.file) as usize].as_mut()
+            self.map[(coord.rank() * self.files + coord.file()) as usize].as_mut()
         } else {
             None
         }
@@ -87,21 +91,17 @@ impl Board {
         }
 
         Some(
-            [
-                coord + Coord { rank: 1, file: 0 },
-                coord - Coord { rank: 1, file: 0 },
-                coord + Coord { rank: 0, file: 1 },
-                coord - Coord { rank: 0, file: 1 },
-            ]
-            .into_iter()
-            .filter_map(|coord| self.get(coord).map(|_| coord))
-            .collect(),
+            coord
+                .adjacent()
+                .into_iter()
+                .filter_map(|coord| self.get(coord).map(|_| coord))
+                .collect(),
         )
     }
 
     pub fn piece_coords(&self) -> impl Iterator<Item = Coord> {
         (0..self.ranks)
-            .flat_map(|rank| (0..self.files).map(move |file| Coord { rank, file }))
+            .flat_map(|rank| (0..self.files).map(move |file| Coord::new(rank, file)))
             .zip(self.map.iter())
             .filter_map(|(coord, tile_option)| {
                 if tile_option.is_some_and(|tile| tile.piece_option.is_some()) {
@@ -123,7 +123,7 @@ impl Index<Coord> for Board {
     type Output = Tile;
 
     fn index(&self, index: Coord) -> &Self::Output {
-        self.map[(index.rank * self.files + index.file) as usize]
+        self.map[(index.rank() * self.files + index.file()) as usize]
             .as_ref()
             .expect("Indexed invalid tile")
     }
@@ -131,8 +131,32 @@ impl Index<Coord> for Board {
 
 impl IndexMut<Coord> for Board {
     fn index_mut(&mut self, index: Coord) -> &mut Self::Output {
-        self.map[(index.rank * self.files + index.file) as usize]
+        self.map[(index.rank() * self.files + index.file()) as usize]
             .as_mut()
             .expect("Indexed invalid tile")
+    }
+}
+
+impl Index<PieceCoord> for Board {
+    type Output = Piece;
+
+    fn index(&self, index: PieceCoord) -> &Self::Output {
+        self.map[(index.rank() * self.files + index.file()) as usize]
+            .as_ref()
+            .expect("PieceCoord always indexes a valid tile")
+            .piece_option
+            .as_ref()
+            .expect("PieceCoord always indexes a valid piece")
+    }
+}
+
+impl IndexMut<PieceCoord> for Board {
+    fn index_mut(&mut self, index: PieceCoord) -> &mut Self::Output {
+        self.map[(index.rank() * self.files + index.file()) as usize]
+            .as_mut()
+            .expect("PieceCoord always indexes a valid tile")
+            .piece_option
+            .as_mut()
+            .expect("PieceCoord always indexes a valid piece")
     }
 }
