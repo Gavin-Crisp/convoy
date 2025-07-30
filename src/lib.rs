@@ -1,7 +1,8 @@
+use crate::coordinates::{PieceCoord, TileCoord};
 use crate::{
     actions::{BattleActor, Command},
     board::Board,
-    coordinates::{Coord, Coordinate},
+    coordinates::Coordinate,
     piece::{Piece, PieceType},
     player::Player,
 };
@@ -63,48 +64,32 @@ impl Game {
         }
     }
 
-    #[expect(clippy::missing_panics_doc)]
-    pub fn do_move(&mut self, from: Coord, to: Coord) {
+    pub fn do_move(&mut self, from: PieceCoord, to: TileCoord) {
         if !self.can_do_move(from, to) {
             // TODO: Error handling
             return;
         }
 
-        let mut piece = self.board[from]
-            .piece_option
-            .expect("Already checked for error");
+        let mut piece = self.board[from];
 
         piece.exhausted = true;
         self.board[to].piece_option = Some(piece);
-        self.board[from].piece_option = None;
+        self.board[from.as_coord()].piece_option = None;
     }
 
     #[must_use]
-    pub fn can_do_move(&self, from: Coord, to: Coord) -> bool {
+    pub fn can_do_move(&self, from: PieceCoord, to: TileCoord) -> bool {
         self.can_move(from, to, self.current_player)
     }
 
     #[must_use]
-    fn can_move(&self, from: Coord, to: Coord, player: Player) -> bool {
-        let Some(from_tile) = self.board.get(from) else {
-            // TODO: Error handling
-            return false;
-        };
-
-        let Some(to_tile) = self.board.get(to) else {
-            // TODO: Error handling
-            return false;
-        };
-
-        if to_tile.piece_option.is_some() {
+    fn can_move(&self, from: PieceCoord, to: TileCoord, player: Player) -> bool {
+        if self.board[to].piece_option.is_some() {
             // TODO: Error handling
             return false;
         }
 
-        let Some(piece) = from_tile.piece_option else {
-            // TODO: Error handling
-            return false;
-        };
+        let piece = self.board[from];
 
         if piece.exhausted {
             // TODO: Error handling
@@ -125,7 +110,7 @@ impl Game {
         true
     }
 
-    pub fn do_recruit(&mut self, piece_type: PieceType, coord: Coord) {
+    pub fn do_recruit(&mut self, piece_type: PieceType, coord: TileCoord) {
         if !self.can_do_recruit(piece_type, coord) {
             // TODO: Error handling
             return;
@@ -136,11 +121,8 @@ impl Game {
     }
 
     #[must_use]
-    pub fn can_do_recruit(&self, piece_type: PieceType, coord: Coord) -> bool {
-        let Some(tile) = self.board.get(coord) else {
-            // TODO: Error handling
-            return false;
-        };
+    pub fn can_do_recruit(&self, piece_type: PieceType, coord: TileCoord) -> bool {
+        let tile = self.board[coord];
 
         if tile.piece_option.is_some() {
             // TODO: Error handling
@@ -162,7 +144,7 @@ impl Game {
 
     pub fn do_battle(
         &mut self,
-        target: Coord,
+        target: PieceCoord,
         target_is_defending: bool,
         initiator: BattleActor,
         attack_supporters: &[BattleActor],
@@ -194,27 +176,23 @@ impl Game {
         );
 
         if attack_power > defence_power {
-            self.board[target].piece_option = None;
+            self.board[target.as_coord()].piece_option = None;
         }
     }
 
     fn resolve_actor(&mut self, battle_actor: BattleActor) -> u8 {
         match battle_actor {
             BattleActor::Static { coord } => {
-                let mut piece = self.board[coord]
-                    .piece_option
-                    .expect("Already checked for errors");
+                let mut piece = self.board[coord];
                 piece.exhausted = true;
-                self.board[coord].piece_option = Some(piece);
+                self.board[coord.as_coord()].piece_option = Some(piece);
                 piece.power()
             }
             BattleActor::Moving { from, to } => {
-                let mut piece = self.board[from]
-                    .piece_option
-                    .expect("Already checked for errors");
+                let mut piece = self.board[from];
                 piece.exhausted = true;
                 self.board[to].piece_option = Some(piece);
-                self.board[from].piece_option = None;
+                self.board[from.as_coord()].piece_option = None;
                 piece.power()
             }
         }
@@ -223,21 +201,13 @@ impl Game {
     #[must_use]
     pub fn can_do_battle(
         &self,
-        target: Coord,
+        target: PieceCoord,
         target_is_defending: bool,
         initiator: BattleActor,
         attack_supporters: &[BattleActor],
         defence_supporters: &[BattleActor],
     ) -> bool {
-        let Some(target_tile) = self.board.get(target) else {
-            // TODO: Error handling
-            return false;
-        };
-
-        let Some(target_piece) = target_tile.piece_option else {
-            // TODO: Error handling
-            return false;
-        };
+        let target_piece = self.board[target];
 
         if target_piece.owner() == self.current_player {
             // TODO: Error handling
@@ -276,21 +246,13 @@ impl Game {
     fn validate_actor(
         &self,
         battle_actor: BattleActor,
-        target: Coord,
+        target: PieceCoord,
         player: Player,
         is_attacking: bool,
     ) -> bool {
         let (piece, end_coord, is_moving) = match battle_actor {
             BattleActor::Static { coord } => {
-                let Some(tile) = self.board.get(coord) else {
-                    // TODO: Error handling
-                    return false;
-                };
-
-                let Some(piece) = tile.piece_option else {
-                    // TODO: Error handling
-                    return false;
-                };
+                let piece = self.board[coord];
 
                 if piece.exhausted {
                     // TODO: Error handling
@@ -302,7 +264,7 @@ impl Game {
                     return false;
                 }
 
-                (piece, coord, false)
+                (piece, coord.as_coord(), false)
             }
             BattleActor::Moving { from, to } => {
                 if !self.can_move(from, to, player) {
@@ -310,13 +272,7 @@ impl Game {
                     return false;
                 }
 
-                (
-                    self.board[from]
-                        .piece_option
-                        .expect("Already know it exists"),
-                    to,
-                    true,
-                )
+                (self.board[from], to.as_coord(), true)
             }
         };
 

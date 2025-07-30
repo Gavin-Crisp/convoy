@@ -1,17 +1,20 @@
-use crate::{coordinates::Coord, piece::PieceType};
+use crate::{
+    coordinates::{PieceCoord, TileCoord},
+    piece::PieceType,
+};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Command {
     Move {
-        from: Coord,
-        to: Coord,
+        from: PieceCoord,
+        to: TileCoord,
     },
     Recruit {
         piece_type: PieceType,
-        coord: Coord,
+        coord: TileCoord,
     },
     Battle {
-        target: Coord,
+        target: PieceCoord,
         target_is_defending: bool,
         initiator: BattleActor,
         attack_supporters: Vec<BattleActor>,
@@ -22,6 +25,6 @@ pub enum Command {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum BattleActor {
-    Static { coord: Coord },
-    Moving { from: Coord, to: Coord },
+    Static { coord: PieceCoord },
+    Moving { from: PieceCoord, to: TileCoord },
 }

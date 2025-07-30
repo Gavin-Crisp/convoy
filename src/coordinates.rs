@@ -77,7 +77,7 @@ impl TileCoord {
     }
 
     #[must_use]
-    pub fn coord(self) -> Coord {
+    pub const fn as_coord(self) -> Coord {
         self.0
     }
 }
@@ -112,11 +112,12 @@ impl PieceCoord {
     }
 
     #[must_use]
-    pub fn coord(self) -> Coord {
+    pub const fn as_coord(self) -> Coord {
         self.0
     }
 
-    pub fn as_tile_coord(self) -> TileCoord {
+    #[must_use]
+    pub const fn as_tile_coord(self) -> TileCoord {
         TileCoord(self.0)
     }
 }
