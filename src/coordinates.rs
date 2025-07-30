@@ -1,7 +1,7 @@
-use crate::board::Board;
+use crate::{board::Board, coordinates::seal::Sealed};
 use std::fmt::Debug;
 
-pub trait Coordinate: Copy + Debug + Default + Eq + PartialEq {
+pub trait Coordinate: Copy + Debug + Default + Eq + PartialEq + Sealed {
     fn rank(self) -> u8;
     fn file(self) -> u8;
     fn distance(self, other: impl Coordinate) -> u8;
@@ -39,6 +39,16 @@ impl Coord {
                 file: self.file - 1,
             },
         ]
+    }
+
+    #[must_use]
+    pub fn into_tile_coord(self, board: &Board) -> Option<TileCoord> {
+        TileCoord::new_from_coord(self, board)
+    }
+
+    #[must_use]
+    pub fn into_piece_coord(self, board: &Board) -> Option<PieceCoord> {
+        PieceCoord::new_from_coord(self, board)
     }
 }
 
@@ -134,4 +144,14 @@ impl Coordinate for PieceCoord {
     fn distance(self, other: impl Coordinate) -> u8 {
         self.0.distance(other)
     }
+}
+
+mod seal {
+    use crate::coordinates::{Coord, PieceCoord, TileCoord};
+
+    pub trait Sealed {}
+
+    impl Sealed for Coord {}
+    impl Sealed for TileCoord {}
+    impl Sealed for PieceCoord {}
 }
