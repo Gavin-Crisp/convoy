@@ -1,7 +1,6 @@
 use crate::{board::Board, coordinates::seal::Sealed};
-use std::fmt::Debug;
 
-pub trait Coordinate: Copy + Debug + Default + Eq + PartialEq + Sealed {
+pub trait Coordinate: Copy + Eq + PartialEq + Sealed {
     fn rank(self) -> u8;
     fn file(self) -> u8;
     fn distance(self, other: impl Coordinate) -> u8;
@@ -71,7 +70,7 @@ impl Coordinate for Coord {
 }
 
 /// A `TileCoord` will always refer to a tile
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct TileCoord(Coord);
 
 impl TileCoord {
@@ -106,7 +105,7 @@ impl Coordinate for TileCoord {
     }
 }
 /// A `PieceCoord` will always refer to a tile with a piece on it
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct PieceCoord(Coord);
 
 impl PieceCoord {
