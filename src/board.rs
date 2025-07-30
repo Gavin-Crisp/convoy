@@ -1,5 +1,5 @@
 use crate::{
-    coordinates::{Coord, Coordinate, PieceCoord},
+    coordinates::{Coord, Coordinate, PieceCoord, TileCoord},
     piece::Piece,
     tile::Tile,
 };
@@ -131,6 +131,24 @@ impl Index<Coord> for Board {
 
 impl IndexMut<Coord> for Board {
     fn index_mut(&mut self, index: Coord) -> &mut Self::Output {
+        self.map[(index.rank() * self.files + index.file()) as usize]
+            .as_mut()
+            .expect("Indexed invalid tile")
+    }
+}
+
+impl Index<TileCoord> for Board {
+    type Output = Tile;
+
+    fn index(&self, index: TileCoord) -> &Self::Output {
+        self.map[(index.rank() * self.files + index.file()) as usize]
+            .as_ref()
+            .expect("Indexed invalid tile")
+    }
+}
+
+impl IndexMut<TileCoord> for Board {
+    fn index_mut(&mut self, index: TileCoord) -> &mut Self::Output {
         self.map[(index.rank() * self.files + index.file()) as usize]
             .as_mut()
             .expect("Indexed invalid tile")

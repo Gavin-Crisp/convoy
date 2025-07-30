@@ -60,6 +60,41 @@ impl Coordinate for Coord {
     }
 }
 
+/// A `TileCoord` will always refer to a tile
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+pub struct TileCoord(Coord);
+
+impl TileCoord {
+    #[must_use]
+    pub fn new(rank: u8, file: u8, board: &Board) -> Option<Self> {
+        Self::new_from_coord(Coord::new(rank, file), board)
+    }
+
+    #[must_use]
+    pub fn new_from_coord(coord: Coord, board: &Board) -> Option<Self> {
+        board.get(coord)?;
+        Some(Self(coord))
+    }
+
+    #[must_use]
+    pub fn coord(self) -> Coord {
+        self.0
+    }
+}
+
+impl Coordinate for TileCoord {
+    fn rank(self) -> u8 {
+        self.0.rank
+    }
+
+    fn file(self) -> u8 {
+        self.0.file
+    }
+
+    fn distance(self, other: impl Coordinate) -> u8 {
+        self.0.distance(other)
+    }
+}
 /// A `PieceCoord` will always refer to a tile with a piece on it
 #[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
 pub struct PieceCoord(Coord);
@@ -79,6 +114,10 @@ impl PieceCoord {
     #[must_use]
     pub fn coord(self) -> Coord {
         self.0
+    }
+
+    pub fn as_tile_coord(self) -> TileCoord {
+        TileCoord(self.0)
     }
 }
 
