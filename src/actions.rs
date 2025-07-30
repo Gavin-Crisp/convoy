@@ -17,6 +17,7 @@ pub enum Command {
         attack_supporters: Vec<BattleActor>,
         defence_supporters: Vec<BattleActor>,
     },
+    EndTurn,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]

@@ -59,6 +59,7 @@ impl Game {
                 attack_supporters,
                 defence_supporters,
             ),
+            Command::EndTurn => self.do_end_turn(),
         }
     }
 
@@ -321,6 +322,17 @@ impl Game {
 
         piece.range().contains(&end_coord.distance(target))
             && piece.can_support(is_attacking, is_moving)
+    }
+
+    pub fn do_end_turn(&mut self) {
+        // Resupply phase
+        // TODO
+
+        // Turn change
+        self.current_player = -self.current_player;
+
+        // Income phase
+        // TODO
     }
 }
 
